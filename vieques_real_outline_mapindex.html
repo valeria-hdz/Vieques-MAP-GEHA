@@ -1,0 +1,174 @@
+
+<h2 style="font-size:16px;font-weight:500;margin:0 0 10px;color:var(--color-text-primary);">Vieques — sediment metal concentrations</h2>
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center;">
+  <span style="font-size:12px;color:var(--color-text-secondary);">Dataset:</span>
+  <button onclick="setDS('total')" id="b-total" style="padding:3px 11px;font-size:12px;border-radius:6px;border:1px solid #1D9E75;background:#1D9E75;color:#fff;cursor:pointer;">Total metals (96h)</button>
+  <button onclick="setDS('bio')" id="b-bio" style="padding:3px 11px;font-size:12px;border-radius:6px;border:1px solid #ccc;background:transparent;color:var(--color-text-primary);cursor:pointer;">Bioavailable (24h)</button>
+</div>
+<div id="mbtns" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;align-items:center;">
+  <span style="font-size:12px;color:var(--color-text-secondary);">Metal:</span>
+</div>
+<svg id="vm" viewBox="0 0 700 260" width="100%" style="border:0.5px solid var(--color-border-tertiary);border-radius:8px;background:#c4dff0;">
+  <rect width="700" height="260" fill="#c4dff0" rx="8"/>
+  <path id="isle" fill="#d8cba8" stroke="#8a7e62" stroke-width="1"/>
+  <text x="350" y="22" font-size="9" fill="#3a6a8a" text-anchor="middle" opacity="0.8">Atlantic Ocean</text>
+  <text x="350" y="250" font-size="9" fill="#3a6a8a" text-anchor="middle" opacity="0.8">Caribbean Sea</text>
+  <text x="18" y="138" font-size="8" fill="#555" text-anchor="middle">N↑</text>
+  <line x1="620" y1="238" x2="660" y2="238" stroke="#444" stroke-width="1.5"/>
+  <line x1="620" y1="234" x2="620" y2="242" stroke="#444" stroke-width="1"/>
+  <line x1="660" y1="234" x2="660" y2="242" stroke="#444" stroke-width="1"/>
+  <text x="640" y="250" font-size="7.5" fill="#444" text-anchor="middle">~10 km</text>
+  <g id="circles"></g>
+  <g id="ttg" style="pointer-events:none;display:none;">
+    <rect id="ttbg" rx="4" fill="white" stroke="#bbb" stroke-width="0.8"/>
+    <text id="ttl1" font-size="11" font-weight="500" fill="#111"/>
+    <text id="ttl2" font-size="10" fill="#444"/>
+    <text id="ttl3" font-size="10" fill="#444"/>
+    <text id="ttl4" font-size="10" fill="#777"/>
+  </g>
+</svg>
+<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;font-size:12px;color:var(--color-text-secondary);">
+  <span style="display:flex;align-items:center;gap:4px;"><svg width="12" height="12"><circle cx="6" cy="6" r="5" fill="#378ADD"/></svg>Zone 1</span>
+  <span style="display:flex;align-items:center;gap:4px;"><svg width="12" height="12"><circle cx="6" cy="6" r="5" fill="#1D9E75"/></svg>Zone 2</span>
+  <span style="display:flex;align-items:center;gap:4px;"><svg width="12" height="12"><circle cx="6" cy="6" r="5" fill="#D85A30"/></svg>Zone 3</span>
+  <span style="display:flex;align-items:center;gap:4px;"><svg width="12" height="12"><circle cx="6" cy="6" r="5" fill="#E24B4A"/></svg>Zone 4</span>
+  <span style="display:flex;align-items:center;gap:4px;"><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="none" stroke="#A32D2D" stroke-width="2.5"/></svg>mortality ≥75%</span>
+  <span style="display:flex;align-items:center;gap:4px;"><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="none" stroke="#BA7517" stroke-width="2.5"/></svg>40–74%</span>
+  <span style="display:flex;align-items:center;gap:4px;"><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="none" stroke="#3B6D11" stroke-width="2.5"/></svg>15–39%</span>
+  <span style="display:flex;align-items:center;gap:4px;"><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="none" stroke="#0C447C" stroke-width="2.5"/></svg>&lt;15% · hover for data</span>
+</div>
+<script>
+const OUTLINE = [[18.16267,-65.39852],[18.1617,-65.39078],[18.16017,-65.38895],[18.16043,-65.3812],[18.15818,-65.37891],[18.15738,-65.37386],[18.15815,-65.36574],[18.15337,-65.36055],[18.15453,-65.35679],[18.15598,-65.35622],[18.15152,-65.34883],[18.14914,-65.3404],[18.14933,-65.33543],[18.1465,-65.33097],[18.14704,-65.32918],[18.14864,-65.32924],[18.14956,-65.32475],[18.14651,-65.32129],[18.14468,-65.31534],[18.1442,-65.31059],[18.14539,-65.30831],[18.14124,-65.30385],[18.14193,-65.30126],[18.14397,-65.3014],[18.14285,-65.29517],[18.14528,-65.29427],[18.14582,-65.29141],[18.14833,-65.28832],[18.14704,-65.28871],[18.14639,-65.28705],[18.1446,-65.28654],[18.14504,-65.28324],[18.13917,-65.27986],[18.13889,-65.27736],[18.13697,-65.27793],[18.13441,-65.27532],[18.13545,-65.26766],[18.13423,-65.26737],[18.13311,-65.27102],[18.12993,-65.27271],[18.1319,-65.27612],[18.13302,-65.2833],[18.13108,-65.2867],[18.13011,-65.29277],[18.12734,-65.29576],[18.12955,-65.29577],[18.13531,-65.29984],[18.13429,-65.30236],[18.13586,-65.30445],[18.13479,-65.30523],[18.13546,-65.30683],[18.13158,-65.3106],[18.12872,-65.3096],[18.12825,-65.30703],[18.12623,-65.30879],[18.12562,-65.31536],[18.12358,-65.31654],[18.12673,-65.31928],[18.12663,-65.32307],[18.12389,-65.32761],[18.12085,-65.32788],[18.1224,-65.3302],[18.12536,-65.33085],[18.12575,-65.33362],[18.12422,-65.33492],[18.12174,-65.33397],[18.12032,-65.33573],[18.1174,-65.33375],[18.12028,-65.33832],[18.11891,-65.33888],[18.11491,-65.33677],[18.11374,-65.33925],[18.11542,-65.33926],[18.1161,-65.3411],[18.11124,-65.34228],[18.1127,-65.34611],[18.1107,-65.34661],[18.11273,-65.34982],[18.11178,-65.35168],[18.11409,-65.35314],[18.11322,-65.35192],[18.11629,-65.34589],[18.11538,-65.34275],[18.11697,-65.34359],[18.11854,-65.34026],[18.12291,-65.33986],[18.12365,-65.33652],[18.12435,-65.33993],[18.12354,-65.33846],[18.12313,-65.34],[18.12065,-65.34015],[18.12053,-65.3444],[18.12125,-65.34518],[18.12398,-65.34317],[18.12138,-65.34674],[18.12444,-65.34649],[18.12197,-65.34873],[18.12288,-65.35077],[18.12629,-65.34935],[18.12455,-65.35314],[18.12602,-65.35356],[18.12482,-65.35479],[18.12699,-65.35662],[18.12605,-65.3584],[18.1307,-65.36236],[18.12881,-65.36514],[18.12594,-65.36401],[18.12503,-65.36635],[18.12051,-65.3649],[18.12471,-65.36795],[18.12364,-65.37522],[18.12004,-65.37496],[18.11694,-65.37252],[18.11618,-65.37333],[18.11746,-65.37387],[18.11753,-65.37581],[18.11453,-65.37737],[18.11305,-65.37665],[18.11134,-65.37764],[18.10781,-65.37469],[18.1068,-65.37527],[18.1082,-65.37817],[18.11042,-65.37808],[18.11252,-65.38189],[18.11215,-65.39105],[18.10944,-65.39299],[18.10739,-65.39285],[18.11101,-65.39751],[18.1085,-65.3999],[18.11126,-65.40125],[18.10865,-65.40325],[18.10844,-65.40545],[18.11336,-65.40579],[18.11379,-65.4089],[18.11153,-65.41086],[18.10756,-65.4077],[18.10608,-65.41199],[18.1081,-65.41244],[18.1086,-65.41485],[18.10636,-65.41836],[18.10264,-65.4169],[18.10131,-65.41889],[18.10192,-65.42131],[18.10801,-65.4254],[18.10772,-65.42406],[18.11153,-65.42419],[18.11204,-65.4252],[18.11095,-65.42557],[18.11234,-65.42642],[18.11101,-65.42631],[18.11063,-65.42816],[18.11233,-65.4282],[18.11058,-65.42875],[18.11047,-65.43131],[18.10912,-65.43158],[18.10971,-65.43236],[18.10667,-65.43602],[18.10537,-65.43089],[18.10405,-65.4309],[18.10402,-65.42691],[18.10158,-65.42549],[18.09965,-65.42197],[18.09786,-65.42394],[18.0961,-65.42321],[18.09397,-65.42632],[18.09482,-65.42739],[18.09336,-65.42954],[18.09437,-65.43105],[18.09272,-65.43183],[18.09176,-65.43807],[18.0936,-65.44017],[18.09615,-65.43919],[18.1009,-65.4414],[18.10068,-65.43979],[18.1044,-65.44009],[18.10463,-65.44866],[18.10297,-65.45126],[18.09977,-65.4502],[18.09916,-65.45152],[18.10004,-65.44703],[18.09776,-65.44044],[18.09469,-65.44291],[18.09268,-65.44248],[18.0916,-65.44498],[18.08903,-65.44523],[18.08913,-65.44713],[18.08742,-65.44869],[18.0908,-65.44907],[18.0907,-65.4517],[18.08671,-65.45054],[18.08635,-65.45166],[18.08768,-65.45689],[18.09334,-65.45407],[18.09655,-65.45859],[18.09665,-65.46435],[18.09468,-65.46769],[18.09241,-65.46837],[18.08954,-65.4655],[18.08774,-65.46663],[18.08964,-65.46903],[18.09144,-65.46767],[18.0931,-65.46911],[18.0966,-65.48077],[18.0944,-65.48909],[18.09577,-65.49217],[18.09122,-65.5098],[18.08209,-65.52424],[18.08224,-65.53038],[18.0804,-65.53274],[18.0823,-65.53766],[18.08119,-65.54181],[18.08465,-65.55044],[18.08594,-65.55909],[18.08816,-65.56062],[18.08914,-65.56555],[18.09059,-65.56603],[18.09178,-65.56946],[18.09836,-65.57103],[18.10252,-65.57768],[18.11089,-65.57521],[18.11619,-65.57558],[18.11979,-65.5778],[18.11863,-65.57102],[18.12049,-65.56738],[18.11949,-65.54563],[18.12784,-65.52483],[18.12912,-65.51642],[18.13232,-65.51202],[18.15133,-65.51379],[18.1341,-65.5118],[18.13374,-65.50709],[18.13478,-65.50346],[18.13641,-65.50337],[18.13524,-65.49708],[18.13692,-65.48677],[18.13955,-65.48351],[18.1412,-65.476],[18.14314,-65.4729],[18.14603,-65.45675],[18.14625,-65.44825],[18.14804,-65.44475],[18.15087,-65.44316],[18.15516,-65.44383],[18.15803,-65.43735],[18.15878,-65.42168],[18.16083,-65.40971],[18.16009,-65.40877],[18.16149,-65.40581],[18.16125,-65.40034],[18.16267,-65.39852]];
+
+const VW=700, VH=260, PL=30, PR=25, PT=30, PB=30;
+const lats=OUTLINE.map(p=>p[0]), lons=OUTLINE.map(p=>p[1]);
+const latMin=Math.min(...lats)-0.003, latMax=Math.max(...lats)+0.003;
+const lonMin=Math.min(...lons)-0.005, lonMax=Math.max(...lons)+0.005;
+
+function proj(lat,lon){
+  const x=PL+(lon-lonMin)/(lonMax-lonMin)*(VW-PL-PR);
+  const y=(VH-PB)-(lat-latMin)/(latMax-latMin)*(VH-PT-PB);
+  return [+x.toFixed(1),+y.toFixed(1)];
+}
+
+const pathEl=document.getElementById('isle');
+const d=OUTLINE.map((p,i)=>{const [x,y]=proj(p[0],p[1]);return (i?'L':'M')+x+' '+y;}).join(' ')+'Z';
+pathEl.setAttribute('d',d);
+
+const ZC={1:'#378ADD',2:'#1D9E75',3:'#D85A30',4:'#E24B4A'};
+function rc(p){return p==null?'#aaa':p>=75?'#A32D2D':p>=40?'#BA7517':p>=15?'#3B6D11':'#0C447C';}
+
+const S=[
+  {id:'LBQ1',z:1,lat:18.10559,lng:-65.5752,loc:'Boca Quebrada',Cu_t:4,Ni_t:1.3,Zn_t:20,Co_t:0.8,m96:100,org:32.66,Mn_b:309.16,Cu_b:43.26,Ni_b:4.57,As_b:3.08,m24:42.5},
+  {id:'LBQ2',z:1,lat:18.10394,lng:-65.5749,loc:'Boca Quebrada',Cu_t:2,Ni_t:0.6,Zn_t:3,Co_t:1,m96:100,org:32.78,Mn_b:234.66,Cu_b:15.28,Ni_b:2.81,As_b:4.42,m24:100},
+  {id:'LBQ3',z:1,lat:18.10248,lng:-65.5739,loc:'Boca Quebrada',Cu_t:1,Ni_t:0.3,Zn_t:2,Co_t:0.2,m96:100,org:29.02,Mn_b:143.15,Cu_b:11.41,Ni_b:2.11,As_b:3.48,m24:100},
+  {id:'LKI1',z:1,lat:18.11649,lng:-65.5616,loc:'Laguna Kiani',Cu_t:17,Ni_t:2,Zn_t:17,Co_t:0.3,m96:95,org:11.73,Mn_b:129.55,Cu_b:14.42,Ni_b:2.8,As_b:4.25,m24:5},
+  {id:'LKI2',z:1,lat:18.11554,lng:-65.5627,loc:'Laguna Kiani',Cu_t:18,Ni_t:3.4,Zn_t:27,Co_t:9,m96:35,org:27.58,Mn_b:265.85,Cu_b:29.19,Ni_b:5.72,As_b:5.1,m24:20},
+  {id:'LKI3',z:1,lat:18.11665,lng:-65.5603,loc:'Laguna Kiani',Cu_t:27,Ni_t:7.3,Zn_t:41,Co_t:11,m96:10,org:22.25,Mn_b:195.74,Cu_b:8.76,Ni_b:1.23,As_b:0.61,m24:15},
+  {id:'LPG1',z:1,lat:18.09092,lng:-65.5134,loc:'Playa Grande',Cu_t:8,Ni_t:1.5,Zn_t:6.5,Co_t:3,m96:97,org:6.24,Mn_b:148.5,Cu_b:11.67,Ni_b:1.7,As_b:1.84,m24:15},
+  {id:'LPG2',z:1,lat:18.08657,lng:-65.5198,loc:'Playa Grande',Cu_t:40,Ni_t:4.2,Zn_t:57.6,Co_t:5,m96:100,org:21.78,Mn_b:1009.01,Cu_b:47.42,Ni_b:4.71,As_b:1.6,m24:10},
+  {id:'LPG3',z:1,lat:18.09025,lng:-65.5130,loc:'Playa Grande',Cu_t:2,Ni_t:2.1,Zn_t:0,Co_t:2,m96:20,org:1.04,Mn_b:24.31,Cu_b:2.28,Ni_b:0.51,As_b:1.09,m24:22.5},
+  {id:'ESZB1',z:2,lat:18.09494,lng:-65.4731,loc:'Esperanza',Cu_t:1.3,Ni_t:1.6,Zn_t:0,Co_t:1,m96:30,org:1.86,Mn_b:90.23,Cu_b:4.27,Ni_b:1.52,As_b:2.29,m24:10},
+  {id:'ESZB2',z:2,lat:18.09407,lng:-65.4711,loc:'Esperanza',Cu_t:27,Ni_t:4.2,Zn_t:2,Co_t:4,m96:25,org:1.80,Mn_b:75.1,Cu_b:2.85,Ni_b:0.92,As_b:1.52,m24:7.5},
+  {id:'ESZB3',z:2,lat:18.09239,lng:-65.4684,loc:'Esperanza',Cu_t:48,Ni_t:2.8,Zn_t:25,Co_t:10.2,m96:42,org:8.68,Mn_b:110.84,Cu_b:1.25,Ni_b:0.4,As_b:1.26,m24:15},
+  {id:'MB1',z:2,lat:18.10384,lng:-65.4516,loc:'Mosquito Bay',Cu_t:7,Ni_t:3.8,Zn_t:7,Co_t:2,m96:40,org:2.32,Mn_b:92.92,Cu_b:46.62,Ni_b:1.54,As_b:1.07,m24:5},
+  {id:'MB2',z:2,lat:18.09959,lng:-65.4456,loc:'Mosquito Bay',Cu_t:3.4,Ni_t:2.3,Zn_t:1,Co_t:6,m96:100,org:2.39,Mn_b:111.34,Cu_b:18.11,Ni_b:2.61,As_b:6.23,m24:10},
+  {id:'SLSB1',z:2,lat:18.09578,lng:-65.4670,loc:'Laguna Sombe',Cu_t:null,Ni_t:null,Zn_t:null,Co_t:null,m96:null,org:null,Mn_b:290.65,Cu_b:2.3,Ni_b:0.55,As_b:0.89,m24:10},
+  {id:'SLSB2',z:2,lat:18.10210,lng:-65.4579,loc:'Laguna Sombe',Cu_t:12,Ni_t:4.1,Zn_t:8,Co_t:0.5,m96:100,org:3.95,Mn_b:700.58,Cu_b:24.36,Ni_b:2.62,As_b:1.24,m24:22.5},
+  {id:'SLSB3',z:2,lat:18.10448,lng:-65.4556,loc:'Laguna Sombe',Cu_t:14,Ni_t:3.1,Zn_t:28,Co_t:3,m96:75,org:13.77,Mn_b:299.69,Cu_b:33.76,Ni_b:7.38,As_b:5.85,m24:5},
+  {id:'ISNC1',z:3,lat:18.14784,lng:-65.4450,loc:'Isabel II NC',Cu_t:12,Ni_t:4.2,Zn_t:2,Co_t:2,m96:12,org:20.33,Mn_b:272.62,Cu_b:17.85,Ni_b:3.71,As_b:9.94,m24:2.5},
+  {id:'ISNC2',z:3,lat:18.15114,lng:-65.4430,loc:'Isabel II NC',Cu_t:14,Ni_t:4.3,Zn_t:1.8,Co_t:2,m96:2,org:20.10,Mn_b:160.1,Cu_b:11.79,Ni_b:3.07,As_b:9.26,m24:15},
+  {id:'ISNC3',z:3,lat:18.15270,lng:-65.4430,loc:'Isabel II NC',Cu_t:12.8,Ni_t:3.7,Zn_t:1.5,Co_t:3,m96:97,org:19.80,Mn_b:130.19,Cu_b:7.03,Ni_b:2.52,As_b:5.66,m24:7.5},
+  {id:'LALG1',z:3,lat:18.15665,lng:-65.3738,loc:'Algodones',Cu_t:13,Ni_t:4.8,Zn_t:35,Co_t:6,m96:100,org:1.51,Mn_b:870.56,Cu_b:30.18,Ni_b:9.62,As_b:1.56,m24:47.5},
+  {id:'LALG2',z:3,lat:18.15663,lng:-65.3741,loc:'Algodones',Cu_t:12.3,Ni_t:4.8,Zn_t:40,Co_t:3,m96:100,org:1.95,Mn_b:1116.53,Cu_b:35.44,Ni_b:8.9,As_b:1.26,m24:67.5},
+  {id:'LALG3',z:3,lat:18.15663,lng:-65.3742,loc:'Algodones',Cu_t:7.9,Ni_t:4.1,Zn_t:29,Co_t:6,m96:100,org:2.97,Mn_b:1226.72,Cu_b:36.41,Ni_b:10.76,As_b:2.1,m24:27.5},
+  {id:'BBSS1',z:4,lat:18.13404,lng:-65.2983,loc:'Salinas del Sur',Cu_t:21,Ni_t:0.3,Zn_t:4,Co_t:0.4,m96:12,org:3.21,Mn_b:72.41,Cu_b:3.25,Ni_b:1.38,As_b:3.92,m24:10},
+  {id:'BBSS2',z:4,lat:18.13531,lng:-65.2997,loc:'Salinas del Sur',Cu_t:57,Ni_t:1.5,Zn_t:4,Co_t:0.2,m96:10,org:3.90,Mn_b:57.68,Cu_b:2.1,Ni_b:0.88,As_b:3.01,m24:22.5},
+  {id:'BBSS3',z:4,lat:18.13558,lng:-65.3011,loc:'Salinas del Sur',Cu_t:1.9,Ni_t:0.8,Zn_t:4,Co_t:1,m96:20,org:3.74,Mn_b:54.54,Cu_b:2.65,Ni_b:0.95,As_b:3.16,m24:5},
+  {id:'LAN1',z:4,lat:18.13738,lng:-65.2975,loc:'Laguna Anones',Cu_t:1.4,Ni_t:null,Zn_t:5,Co_t:1,m96:100,org:31.23,Mn_b:272.37,Cu_b:26.52,Ni_b:5.57,As_b:2.93,m24:35},
+  {id:'LAN2',z:4,lat:18.13578,lng:-65.2980,loc:'Laguna Anones',Cu_t:1.3,Ni_t:null,Zn_t:19,Co_t:1,m96:100,org:16.75,Mn_b:null,Cu_b:null,Ni_b:5.79,As_b:5.68,m24:42.5},
+  {id:'LAN3',z:4,lat:18.13442,lng:-65.2973,loc:'Laguna Anones',Cu_t:3,Ni_t:null,Zn_t:0,Co_t:2,m96:100,org:6.06,Mn_b:107.14,Cu_b:10.39,Ni_b:1.74,As_b:2.25,m24:7.5},
+];
+
+const METALS={total:[{k:'Cu_t',lbl:'Cu'},{k:'Ni_t',lbl:'Ni'},{k:'Zn_t',lbl:'Zn'},{k:'Co_t',lbl:'Co'}],bio:[{k:'Cu_b',lbl:'Cu (BIOav)'},{k:'Ni_b',lbl:'Ni (BIOav)'},{k:'Mn_b',lbl:'Mn (BIOav)'},{k:'As_b',lbl:'As (BIOav)'}]};
+const MK={total:'m96',bio:'m24'}, UN={total:'mg/kg',bio:'µg/g'};
+let curDS='total', curM='Cu_t';
+
+function gmax(k){return Math.max(...S.map(s=>s[k]||0));}
+function cr(v,mx){return v?3+(v/mx)*15:2;}
+const ns='http://www.w3.org/2000/svg';
+
+function buildBtns(ds){
+  const div=document.getElementById('mbtns');
+  div.innerHTML='<span style="font-size:12px;color:var(--color-text-secondary);">Metal:</span>';
+  METALS[ds].forEach((m,i)=>{
+    const b=document.createElement('button');
+    b.textContent=m.lbl; b.dataset.key=m.k;
+    const on=i===0;
+    b.style.cssText=`padding:3px 11px;font-size:12px;border-radius:6px;cursor:pointer;border:1px solid ${on?'#378ADD':'#ccc'};background:${on?'#378ADD':'transparent'};color:${on?'#fff':'var(--color-text-primary)'};`;
+    b.onclick=()=>setM(m.k);
+    div.appendChild(b);
+  });
+  curM=METALS[ds][0].k;
+}
+
+function setM(k){
+  curM=k;
+  document.querySelectorAll('#mbtns button').forEach(b=>{
+    const a=b.dataset.key===k;
+    b.style.background=a?'#378ADD':'transparent';
+    b.style.color=a?'#fff':'var(--color-text-primary)';
+    b.style.borderColor=a?'#378ADD':'#ccc';
+  });
+  render();
+}
+
+function setDS(ds){
+  curDS=ds;
+  ['total','bio'].forEach(d=>{
+    const b=document.getElementById('b-'+d), on=d===ds;
+    b.style.background=on?'#1D9E75':'transparent';
+    b.style.color=on?'#fff':'var(--color-text-primary)';
+    b.style.borderColor=on?'#1D9E75':'#ccc';
+  });
+  buildBtns(ds); render();
+}
+
+function render(){
+  const g=document.getElementById('circles');
+  g.innerHTML='';
+  const mx=gmax(curM), mk=MK[curDS], un=UN[curDS];
+  S.forEach(s=>{
+    const [cx,cy]=proj(s.lat,s.lng);
+    const val=s[curM], mort=s[mk], r=cr(val,mx);
+    const grp=document.createElementNS(ns,'g');
+    grp.style.cursor='pointer';
+    const c=document.createElementNS(ns,'circle');
+    c.setAttribute('cx',cx); c.setAttribute('cy',cy); c.setAttribute('r',r);
+    c.setAttribute('fill',ZC[s.z]); c.setAttribute('fill-opacity',val!=null?'0.85':'0.15');
+    c.setAttribute('stroke',rc(mort)); c.setAttribute('stroke-width','2');
+    const lbl=document.createElementNS(ns,'text');
+    lbl.setAttribute('x',cx); lbl.setAttribute('y',cy-r-2);
+    lbl.setAttribute('text-anchor','middle'); lbl.setAttribute('font-size','6.5');
+    lbl.setAttribute('fill','#111'); lbl.setAttribute('pointer-events','none');
+    lbl.textContent=s.id;
+    grp.addEventListener('mouseenter',()=>{
+      const tg=document.getElementById('ttg');
+      const bx=cx>400?cx-178:cx+10, by=cy>180?cy-75:cy+8;
+      document.getElementById('ttbg').setAttribute('x',bx-4); document.getElementById('ttbg').setAttribute('y',by-14);
+      document.getElementById('ttbg').setAttribute('width','175'); document.getElementById('ttbg').setAttribute('height','64');
+      const mk2=curM.replace('_t','').replace('_b','');
+      document.getElementById('ttl1').setAttribute('x',bx+4); document.getElementById('ttl1').setAttribute('y',by); document.getElementById('ttl1').textContent=`${s.id} · ${s.loc}`;
+      document.getElementById('ttl2').setAttribute('x',bx+4); document.getElementById('ttl2').setAttribute('y',by+14); document.getElementById('ttl2').textContent=`${mk2}: ${val!=null?val+' '+un:'—'}`;
+      document.getElementById('ttl3').setAttribute('x',bx+4); document.getElementById('ttl3').setAttribute('y',by+28); document.getElementById('ttl3').textContent=`${mk==='m96'?'96h':'24h'} mortality: ${mort!=null?mort+'%':'—'}`;
+      document.getElementById('ttl4').setAttribute('x',bx+4); document.getElementById('ttl4').setAttribute('y',by+43); document.getElementById('ttl4').textContent=`Org: ${s.org!=null?s.org+'%':'—'} · Zone ${s.z}`;
+      tg.style.display='';
+    });
+    grp.addEventListener('mouseleave',()=>{ document.getElementById('ttg').style.display='none'; });
+    grp.appendChild(c); grp.appendChild(lbl); g.appendChild(grp);
+  });
+  document.getElementById('ttg').style.display='none';
+}
+
+buildBtns('total'); render();
+</script>
